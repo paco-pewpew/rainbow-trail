@@ -1,0 +1,57 @@
+<!doctype html>
+<html ng-app="chatApp">
+<head>
+	      <title>The beginning of awesomeness</title>
+        <link rel="stylesheet" type="text/css" href="libs/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/style.css">
+</head>
+<body ng-controller="ChatCtrl">
+	<div class="container">
+    <div class="row">
+
+      <div id="chat" class="col-lg-3">
+          <div class="row">
+            <form ng-hide="isLogged">
+              <label>username: </label>
+              <input id="name" ng-model="username">
+              <button ng-click="setName()">choose name</button>
+            </form>
+            <p ng-show="isLogged">{{username}}</p>
+          </div>
+          <div class="row">
+            <button ng-show="isLogged && !gameData" ng-click="findGame()">Find a game</button>
+          </div> 
+      </div>
+      <div id="game" class="col-lg-6 col-lg-offset-1">
+        <div class="row" ng-repeat="roll in gameData.gameData.mapStart">
+          <div class="col-lg-1" ng-repeat="column in roll track by $index">{{column}}</div>
+        </div>
+      </div>
+      <div id="gameInfo" class="col-lg-2">
+        <div id="stats" class="row">
+          <p>stats, points and such</p>
+          <p ng-repeat="player in [gameData.gameData.player1,gameData.gameData.player2] track by $index">
+            {{player.name}} : {{player.points}}
+          </p>
+        </div>
+        <div id="gameStickFrame" class="row">
+          <div class="col-lg-6" gamestick turn="{{turn}}">
+            <label id="topButton" ng-click="setTurn('top')"></label>
+            <label id="leftButton" ng-click="setTurn('left')"></label>
+            <label id="rightButton" ng-click="setTurn('right')"></label>
+            <label id="bottomButton" ng-click="setTurn('bottom')"></label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="libs/angular/angular.min.js"></script>
+  <script src="js/services/SocketService.js"></script>
+  <script src="js/controllers/GameStickController.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
