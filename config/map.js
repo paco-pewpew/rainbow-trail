@@ -15,7 +15,10 @@ module.exports={
 			map[i]=new Array(height);
 			for(var j=0;j<height;j++){
 				var god=Math.random();
-				if(god<0.1){
+				if(god<0.1 &&
+				//we don't want any walls near border for instant GG 
+					!(i===0 && (j===0 ||j==1)) && !(i===height &&(j===width||j===width-1))
+					){
 					map[i][j]=1;
 				}else if(god<0.2){
 					map[i][j]=2;

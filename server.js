@@ -47,11 +47,9 @@ function updatePosition(positions,turn){
 		case('bottom'):positions[0]+=1;break;
 	}
 }
-function updateMap(game,map,p1Old,p2Old,p1,p2){
-	switch(map[p1[0]][p1[1]]){
-		case(1):
-		//stops the game
-		//remove game from games array and iterator
+
+function stopGame(game,winner,reason){
+	//remove game from games array and iterator
 		games=games.filter(function(el){
 			if(el.name===game.name){
 				//probably should leave room lol?
@@ -61,7 +59,33 @@ function updateMap(game,map,p1Old,p2Old,p1,p2){
 			}
 		});
 		io.to(game.name)
-			.emit('game stop',{msg:'player1 has crashed',data:game});
+			.emit('game stop',{msg:reason,data:game});
+}
+
+function updateMap(game,map,p1Old,p2Old,p1,p2){
+	//check if there are ANY bonuses left (if not game stops)
+	var bonusesLeft=map.map(function(row){
+		var test=row.some(function(criteria){
+			return criteria===2;
+		})
+		return test;
+	}).reduce(function(a,b){return a||b});
+	if(!bonusesLeft){
+		stopGame(game,'dunno for winner','no bonuses left');
+		return;
+	}
+
+	//check if target is out of bounds
+	if(p1[0]<0||p1[0]>11||p1[1]<0||p1[1]>11){
+		//out of bounds
+		stopGame(game,'player2','player1 out of bounds');
+		return;
+	}
+
+	switch(map[p1[0]][p1[1]]){
+		case(1):
+		//stops the game
+		stopGame(game,'player2','player1 has crashed');
 		break;
 		case(2):
 		//adds bonus bonus
@@ -71,14 +95,6 @@ function updateMap(game,map,p1Old,p2Old,p1,p2){
 		map[p1Old[0]][p1Old[1]]=0;
 		map[p1[0]][p1[1]]='p1';
 	}
-
-	/*
-	map[p1Old[0]][p1Old[1]]=0;
-	map[p2Old[0]][p2Old[1]]=0;
-	map[p1[0]][p1[1]]='p1';
-	map[p2[0]][p2[1]]='p2';*/
-
-	//send to player1s room:
 	io.to(game.name)
 		.emit('game update',{msg:'update the game state',data:game});
 }

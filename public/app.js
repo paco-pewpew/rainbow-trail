@@ -34,16 +34,9 @@ angular.module('chatApp',['SocketService'])
 		});
 
 		socketio.on('game stop',function(msg){
-			$scope.inGame=false;
+			//$scope.inGame=false;
 			console.log(msg);
 		});
-
-		socketio.on('chat message',function(msg){
-			console.log(msg);
-			$scope.messages.push(msg);
-			//$scope.$digest();
-		});
-
 	}])
 
 .directive('gamestick',function(){
