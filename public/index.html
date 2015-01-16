@@ -9,26 +9,33 @@
 	<div class="container">
     <div class="row">
 
-      <div id="homescreen" ng-show="!inGame" class="col-xs-6">
+    <div id="wrapframe" class="col-xs-6">
+
+    
+      <div id="homescreen" ng-show="!inGame" class="col-xs-12">
           <div class="row">
             <form ng-hide="isLogged">
-              <label>username: </label>
+              <label>USERNAME: </label>
               <input id="name" ng-model="username">
               <button ng-click="setName()">choose name</button>
             </form>
           </div>
           <div class="row">
              <p ng-show="isLogged">{{username}}</p>
-            <button ng-show="isLogged && !gameData" ng-click="findGame()">Find a game</button>
+              <button ng-show="isLogged && !gameData" ng-click="findGame()">Find a game</button>
           </div> 
       </div>
 
-      <div id="game" ng-show="inGame" class="col-xs-5">
-        <div class="row" ng-repeat="roll in gameData.gameData.mapStart">
-          <div class="col-xs-1 gamecells" ng-repeat="column in roll track by $index">{{column}}</div>
+      <div id="game" ng-show="inGame" class="col-xs-10">
+        <div ng-repeat="roll in gameData.gameData.mapStart">
+          <div ng-class="{'cell0':column===0,'cell1':column===1,'cell2':column===2,'p1':column==='p1','p2':column==='p2'}" 
+          ng-repeat="column in roll track by $index"
+          >
+            {{column}}
+          </div>
         </div>
       </div>
-      <div id="gameInfo" ng-show="inGame" class="col-xs-1">
+      <div id="gameInfo" ng-show="inGame" class="col-xs-2">
         <div id="stats" class="row">
           <p ng-repeat="player in [gameData.gameData.player1,gameData.gameData.player2] track by $index">
             {{player.name}} : {{player.points}}
@@ -43,6 +50,7 @@
           </div>
         </div>
       </div>
+    </div>
 
     </div>
   </div>

@@ -49,6 +49,8 @@ function updatePosition(positions,turn){
 }
 
 function stopGame(game,winner,reason){
+	//set winner
+	game.gameData.winner=winner;
 	//remove game from games array and iterator
 		games=games.filter(function(el){
 			if(el.name===game.name){
@@ -71,12 +73,17 @@ function updateMap(game,map,p1Old,p2Old,p1,p2){
 		return test;
 	}).reduce(function(a,b){return a||b});
 	if(!bonusesLeft){
-		stopGame(game,'dunno for winner','no bonuses left');
+		//check who has more points
+		if(game.gameData.player1.points>=game.gameData.player2.points){
+			stopGame(game,'player1','no bonuses left');
+		}else{
+			stopGame(game,'player2','no bonuses left');
+		}
 		return;
 	}
 
 	//check if target is out of bounds
-	if(p1[0]<0||p1[0]>11||p1[1]<0||p1[1]>11){
+	if(p1[0]<0||p1[0]>mapScheme.width-1||p1[1]<0||p1[1]>mapScheme.heigth-1){
 		//out of bounds
 		stopGame(game,'player2','player1 out of bounds');
 		return;
@@ -126,7 +133,7 @@ io.on('connection',function(socket){
 				},
 				player2:{
 					name:games[games.length-1].players[1],
-					position:[11,11],
+					position:[mapScheme.width-1,mapScheme.height-1],
 					turn:'left',
 					points:0
 				}

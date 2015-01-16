@@ -3,9 +3,8 @@
 //1-wall
 //2-bonus
 
-//map is 12x12 blocks(divs)
-var height=12;
-var width=12;
+var height=10;
+var width=10;
 
 module.exports={
 	//new map every game!
@@ -17,7 +16,8 @@ module.exports={
 				var god=Math.random();
 				if(god<0.1 &&
 				//we don't want any walls near border for instant GG 
-					!(i===0 && (j===0 ||j==1)) && !(i===height &&(j===width||j===width-1))
+					!(i===0 && (j===0 ||j==1)) && !(i===1 && (j===0||j===1)) && 
+					!(i===height &&(j===width||j===width-1)) && !(i===(height-1) &&(j===width||j===width-1))
 					){
 					map[i][j]=1;
 				}else if(god<0.2){
@@ -28,6 +28,7 @@ module.exports={
 			}
 		}
 		return map;
-
-	}
+	},
+	height:height,
+	width:width
 };

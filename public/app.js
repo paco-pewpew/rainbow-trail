@@ -36,6 +36,8 @@ angular.module('chatApp',['SocketService'])
 		socketio.on('game stop',function(msg){
 			//$scope.inGame=false;
 			console.log(msg);
+			console.log(msg.data.gameData.winner);
+			console.log(msg.data.gameData[msg.data.gameData.winner].name);
 		});
 	}])
 
@@ -50,8 +52,10 @@ angular.module('chatApp',['SocketService'])
 					element.css({
 					'background-image': 'url(../img/gameStick_'+value+'.png)',
 					//'background-size':'100px 100px',
-					'background-size':'cover',
-					'baclground-repeat':'no-repeat',
+					'background-size':'100% 100%',
+					'background-repeat':'no-repeat',
+					'border':'3px ridge #c3c3c3',
+					'border-radius':'50%',
 					'height':'100px',
 					'padding':'0px'
 					});
