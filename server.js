@@ -90,7 +90,10 @@ function updateMap(game,map,p1Old,p2Old,p1,p2){
 	}
 
 	switch(map[p1[0]][p1[1]]){
+		case('p2'):
+		//hit other player
 		case(1):
+		//hit wall
 		//stops the game
 		stopGame(game,'player2','player1 has crashed');
 		break;

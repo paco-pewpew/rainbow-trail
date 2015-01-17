@@ -13,17 +13,36 @@
 
     
       <div id="homescreen" ng-show="!inGame" class="col-xs-12">
-          <div class="row">
-            <form ng-hide="isLogged">
+          <div class="row" ng-hide="isLogged">
+            <form>
               <label>USERNAME: </label>
               <input id="name" ng-model="username">
               <button ng-click="setName()">choose name</button>
             </form>
           </div>
-          <div class="row">
-             <p ng-show="isLogged">{{username}}</p>
-              <button ng-show="isLogged && !gameData" ng-click="findGame()">Find a game</button>
-          </div> 
+          <div id="userPannel" class="row" ng-show="isLogged">
+             <p>{{username|uppercase}}</p>
+             <div class="col-xs-12">
+              <div>Past games:</div>
+              {{gameHistory.length===0?'You havn\'t played yet':gameHistory}}
+            </div>
+             <button ng-show="!gameData && !searchingForGame" ng-click="findGame()">Find a game</button>
+             <div ng-show="searchingForGame">
+                <p>waiting for the second fat unicorn ...</p>
+                <div id="loadingPic"></div>
+             </div>
+          </div>
+          <div id="postGameData" class="row" ng-show="gameData && !searchingForGame">
+            <div class="col-xs-6 col-xs-offset-3">
+              <p>You {{gameData.gameData[gameData.gameData.winner].name===username?'WON':'LOST'}}</p>
+              <p>Game: {{gameData.name}}</p>
+              <img ng-src="img/p1.png"><img ng-src="img/p2.png">
+              <p>{{gameData.gameData.player1.name}} vs {{gameData.gameData.player2.name}}</p>
+              <p>{{stopReason}}</p>
+              <p>Winner: {{gameData.gameData[gameData.gameData.winner].name}} ({{gameData.gameData.winner}})</p>
+              <button ng-click="findGame()">play again!</button>
+            </div>
+          </div>
       </div>
 
       <div id="game" ng-show="inGame" class="col-xs-10">

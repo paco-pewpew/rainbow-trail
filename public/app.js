@@ -1,11 +1,13 @@
 'use strict';
 angular.module('chatApp',['SocketService'])
-	.controller('ChatCtrl',['$scope','socketio',function($scope,socketio){
-		$scope.messages=[{user:'server',text:'Hello'}];
-		$scope.message;
+	.controller('ChatCtrl',['$scope','socketio','$window',function($scope,socketio,$window){
+		/*$scope.messages=[{user:'server',text:'Hello'}];
+		$scope.message;*/
 		$scope.isLogged=false;
 		$scope.inGame=false;
+		$scope.searchingForGame=false;
 		$scope.turn='idle';
+		$scope.gameHistory=[];
 
 		$scope.setTurn=function(way){
 			$scope.turn=way;
@@ -19,11 +21,14 @@ angular.module('chatApp',['SocketService'])
 		};
 		
 		$scope.findGame=function(){
+			delete $scope.gameData;
+			$scope.searchingForGame=true;
 			socketio.emit('find game',{name:$scope.username});
 		};
 
 		socketio.on('game start',function(msg){
 			console.log(msg);
+			$scope.searchingForGame=false;
 			$scope.inGame=true;
 			$scope.gameData=msg.data;
 		});
@@ -35,9 +40,13 @@ angular.module('chatApp',['SocketService'])
 
 		socketio.on('game stop',function(msg){
 			//$scope.inGame=false;
+			$scope.gameData=msg.data;
+			$scope.stopReason=msg.msg;
+			$scope.inGame=false;
+			$scope.gameHistory.unshift({game:msg.data.name,winner:msg.data.gameData[msg.data.gameData.winner].name})
+
 			console.log(msg);
-			console.log(msg.data.gameData.winner);
-			console.log(msg.data.gameData[msg.data.gameData.winner].name);
+			console.log($scope.gameHistory);
 		});
 	}])
 
@@ -62,4 +71,12 @@ angular.module('chatApp',['SocketService'])
 				});
 			}
 		};
-	});
+	})
+.directive('gamehistory',function(){
+	return{
+		restrict:'EA',
+		link:function(scope,element,attrs){
+			//SNEAKY
+		}	
+	};
+});

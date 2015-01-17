@@ -28,6 +28,53 @@
       margin:auto;
       margin-top: 40%;  
 }
+#loadingPic{
+      background-image: url(../img/loading.png);
+      background-size:contain; 
+      background-repeat: no-repeat;
+      height:100px;
+      width:100px;
+      margin-left: 40%;
+      -webkit-animation: load 1.7s infinite ease;
+}
+@-webkit-keyframes load {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+
+
+
+
+#userPannel>div:first-of-type{
+      /*background: rgba(43, 163, 177, 0.6);*/
+      /*background: linear-gradient(to bottom, rgba(28,28,28,1) 0%,rgba(41,137,216,1) 49%,rgba(32,124,202,1) 51%,rgba(28,28,28,1) 100%);*/
+      background: linear-gradient(to bottom, rgba(43, 163, 177, 0.2) 0%,rgba(41,137,216,1) 49%,rgba(32,124,202,1) 51%,rgba(43, 163, 177, 0.2) 100%);
+      border-radius:2px;
+}
+#userPannel>div>div:first-child{
+      float: left;
+      border-right: 4px solid #1c1c1c;
+      padding-right: 5px;
+}
+#userPannel>button{
+      width:20%;
+      margin-left:40%;
+      margin-right: 40%;
+}
+#postGameData>div {
+      background: #222222;
+      border:3px groove #c3c3c3;
+      border-radius:10px;
+      text-align: center;
+      padding:10px;
+}
 
 
 #game{
