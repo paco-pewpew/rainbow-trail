@@ -43,21 +43,39 @@ angular.module('chatApp',['SocketService'])
 			$scope.gameData=msg.data;
 			$scope.stopReason=msg.msg;
 			$scope.inGame=false;
-			$scope.gameHistory.unshift({game:msg.data.name,winner:msg.data.gameData[msg.data.gameData.winner].name})
+			$scope.gameHistory.unshift({game:msg.data.name,winner:msg.data.gameData[msg.data.gameData.winner].name});
 
 			console.log(msg);
 			console.log($scope.gameHistory);
 		});
+
+		//keyboard controlls
+		$window.addEventListener('keydown', function(event) {
+		  switch (event.keyCode) {
+		    case 37: // Left
+		      $scope.setTurn('left');
+		    break;
+
+		    case 38: // Up
+		      $scope.setTurn('up');
+		    break;
+
+		    case 39: // Right
+		      $scope.setTurn('right');
+		    break;
+
+		    case 40: // Down
+		      $scope.setTurn('down');
+		    break;
+		  }
+		}, false);
 	}])
 
 .directive('gamestick',function(){
 		return{
 			restrict:'EA',
 			link:function(scope,element,attrs){
-				//var cP=attrs.colorPositive;
-				//var cN=attrs.colorNegative;
 				attrs.$observe('turn',function(value){
-					console.log(value);
 					element.css({
 					'background-image': 'url(../img/gameStick_'+value+'.png)',
 					//'background-size':'100px 100px',
@@ -72,11 +90,92 @@ angular.module('chatApp',['SocketService'])
 			}
 		};
 	})
+.directive('gamecell',function(){
+	return{
+		restrict:'EA',
+		scope:{mapcell:'@'},
+		link:function(scope,element,attrs){
+			var rotate=0;
+			switch(scope.mapcell){
+				case('p1tail_right_right'):
+				scope.mapcell='tail_forward';
+				rotate=0;
+				break;
+				case('p1tail_down_down'):
+				scope.mapcell='tail_forward';
+				rotate=90;
+				break;
+				case('p1tail_left_left'):
+				scope.mapcell='tail_forward';
+				rotate=180;
+				break;
+				case('p1tail_up_up'):
+				scope.mapcell='tail_forward';
+				rotate=270;
+				break;
+
+				case('p1tail_right_down'):
+				scope.mapcell='tail_turnRight';
+				rotate=0;
+				break;
+				case('p1tail_down_left'):
+				scope.mapcell='tail_turnRight';
+				rotate=90;
+				break;
+				case('p1tail_left_up'):
+				scope.mapcell='tail_turnRight';
+				rotate=180;
+				break;
+				case('p1tail_up_right'):
+				scope.mapcell='tail_turnRight';
+				rotate=270;
+				break;
+
+				case('p1tail_right_up'):
+				scope.mapcell='tail_turnLeft';
+				rotate=0;
+				break;
+				case('p1tail_up_left'):
+				scope.mapcell='tail_turnLeft';
+				rotate=270;
+				break;
+				case('p1tail_left_down'):
+				scope.mapcell='tail_turnLeft';
+				rotate=180;
+				break;
+				case('p1tail_down_right'):
+				scope.mapcell='tail_turnLeft';
+				rotate=90;
+				break;
+
+				case('p1tailEnd_right'):
+				scope.mapcell='tailEnd';
+				rotate=0;
+				break;
+				case('p1tailEnd_down'):
+				scope.mapcell='tailEnd';
+				rotate=90;
+				break;
+				case('p1tailEnd_left'):
+				scope.mapcell='tailEnd';
+				rotate=180;
+				break;
+				case('p1tailEnd_up'):
+				scope.mapcell='tailEnd';
+				rotate=270;
+				break;
+
+			}
+			element.css({
+					'background-image': 'url(../img/'+scope.mapcell+'.png)',
+					'transform':'rotate('+rotate+'deg)'
+				});
+		}
+	};
+})
 .directive('gamehistory',function(){
 	return{
 		restrict:'EA',
-		link:function(scope,element,attrs){
-			//SNEAKY
-		}	
+		templateUrl:'../views/gamehistory.html'
 	};
 });

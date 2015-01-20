@@ -22,9 +22,7 @@
           </div>
           <div id="userPannel" class="row" ng-show="isLogged">
              <p>{{username|uppercase}}</p>
-             <div class="col-xs-12">
-              <div>Past games:</div>
-              {{gameHistory.length===0?'You havn\'t played yet':gameHistory}}
+             <div gamehistory class="col-xs-12">
             </div>
              <button ng-show="!gameData && !searchingForGame" ng-click="findGame()">Find a game</button>
              <div ng-show="searchingForGame">
@@ -36,24 +34,32 @@
             <div class="col-xs-6 col-xs-offset-3">
               <p>You {{gameData.gameData[gameData.gameData.winner].name===username?'WON':'LOST'}}</p>
               <p>Game: {{gameData.name}}</p>
-              <img ng-src="img/p1.png"><img ng-src="img/p2.png">
-              <p>{{gameData.gameData.player1.name}} vs {{gameData.gameData.player2.name}}</p>
+              <div class="row">
+                <div class="col-xs-5">
+                  <img ng-src="img/p1.png">
+                  <p>{{gameData.gameData.player1.name}}</p>    
+                </div>
+                <div class="col-xs-2">
+                  vs
+                </div>
+                <div class="col-xs-5">
+                  <img ng-src="img/p2.png">
+                  <p>{{gameData.gameData.player2.name}}</p>
+                </div>
+              </div>
               <p>{{stopReason}}</p>
               <p>Winner: {{gameData.gameData[gameData.gameData.winner].name}} ({{gameData.gameData.winner}})</p>
               <button ng-click="findGame()">play again!</button>
             </div>
           </div>
       </div>
-
+      <!--GAME FIELD why divs...-->
       <div id="game" ng-show="inGame" class="col-xs-10">
         <div ng-repeat="roll in gameData.gameData.mapStart">
-          <div ng-class="{'cell0':column===0,'cell1':column===1,'cell2':column===2,'p1':column==='p1','p2':column==='p2'}" 
-          ng-repeat="column in roll track by $index"
-          >
-            {{column}}
-          </div>
+          <div gamecell ng-repeat="column in roll track by $index" mapcell="{{column}}"></div>
         </div>
       </div>
+
       <div id="gameInfo" ng-show="inGame" class="col-xs-2">
         <div id="stats" class="row">
           <p ng-repeat="player in [gameData.gameData.player1,gameData.gameData.player2] track by $index">
@@ -62,10 +68,10 @@
         </div>
         <div id="gameStickFrame" class="row">
           <div class="col-xs-12" gamestick turn="{{turn}}">
-            <label id="topButton" ng-click="setTurn('top')"></label>
+            <label id="topButton" ng-click="setTurn('up')"></label>
             <label id="leftButton" ng-click="setTurn('left')"></label>
             <label id="rightButton" ng-click="setTurn('right')"></label>
-            <label id="bottomButton" ng-click="setTurn('bottom')"></label>
+            <label id="bottomButton" ng-click="setTurn('down')"></label>
           </div>
         </div>
       </div>

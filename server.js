@@ -26,14 +26,20 @@ function updateGames(dt){
 	games.forEach(function(game){
 		//if there are 2 players then we playing
 		if(game.playersNumber===2){
-			//save old position
-			var p1Old=[game.gameData.player1.position[0],game.gameData.player1.position[1]];
-			var p2Old=[game.gameData.player2.position[0],game.gameData.player2.position[1]];
+			//places new head to be updated
+			game.gameData.player1.position.unshift([game.gameData.player1.position[0][0],game.gameData.player1.position[0][1]]);
+			//save old position on tail
+			var p1Old=[game.gameData.player1.position[game.gameData.player1.position.length-1][0],
+						game.gameData.player1.position[game.gameData.player1.position.length-1][1],
+						game.gameData.player1.position[game.gameData.player1.position.length-1][2]];
+			var p2Old=[game.gameData.player2.position[game.gameData.player2.position.length-1][0],
+						game.gameData.player2.position[game.gameData.player2.position.length-1][1],
+						game.gameData.player1.position[game.gameData.player1.position.length-1][2]];
 			//update positions for now only testing with 1 player
-			updatePosition(game.gameData.player1.position,game.gameData.player1.turn);
+			updatePosition(game.gameData.player1.position[0],game.gameData.player1.turn);
 			//updatePosition(game.gameData.player2.position,game.gameData.player2.turn);
 			//update map
-			updateMap(game,game.gameData.mapStart,p1Old,p2Old,game.gameData.player1.position,game.gameData.player2.position);
+			updateMap(game,game.gameData.mapStart,p1Old,p2Old,game.gameData.player1.position[0],game.gameData.player2.position[0]);
 		}
 	});
 }
@@ -41,10 +47,10 @@ main();
 
 function updatePosition(positions,turn){
 	switch(turn){
-		case('right'): positions[1]+=1;break;
-		case('left'): positions[1]-=1;break;
-		case('top'): positions[0]-=1;break;
-		case('bottom'):positions[0]+=1;break;
+		case('right'): positions[1]+=1;positions[2]='right';break;
+		case('left'): positions[1]-=1;positions[2]='left';break;
+		case('up'): positions[0]-=1;positions[2]='up';break;
+		case('down'):positions[0]+=1;positions[2]='down';break;
 	}
 }
 
@@ -69,9 +75,9 @@ function updateMap(game,map,p1Old,p2Old,p1,p2){
 	var bonusesLeft=map.map(function(row){
 		var test=row.some(function(criteria){
 			return criteria===2;
-		})
+		});
 		return test;
-	}).reduce(function(a,b){return a||b});
+	}).reduce(function(a,b){return a||b;});
 	if(!bonusesLeft){
 		//check who has more points
 		if(game.gameData.player1.points>=game.gameData.player2.points){
@@ -100,10 +106,37 @@ function updateMap(game,map,p1Old,p2Old,p1,p2){
 		case(2):
 		//adds bonus bonus
 		game.gameData.player1.points+=1;
+		//map[p1[0]][p1[1]]='p1';
+		/*game.gameData.player1.position.forEach(function(el){
+			map[el[0]][el[1]]='p1'+el[2];
+		});*/
+		game.gameData.player1.position.forEach(function(el,id,array){
+			if(id===0){
+				map[el[0]][el[1]]='p1'+el[2];
+			}else if(id===array.length-1){
+				map[el[0]][el[1]]='p1tailEnd_'+array[id-1][2];
+			}else{
+				//tail from-to ex: right-down makes right turn
+				map[el[0]][el[1]]='p1tail_'+el[2]+'_'+array[id-1][2];
+			}
+		});
+		break;
 		case(0):
 		//normal case
 		map[p1Old[0]][p1Old[1]]=0;
-		map[p1[0]][p1[1]]='p1';
+		//removes last cuz head was created
+		game.gameData.player1.position.pop();
+		//map[p1[0]][p1[1]]='p1';
+		game.gameData.player1.position.forEach(function(el,id,array){
+			if(id===0){
+				map[el[0]][el[1]]='p1'+el[2];
+			}else if(id===array.length-1){
+				map[el[0]][el[1]]='p1tailEnd_'+array[id-1][2];
+			}else{
+				//tail from-to ex: right-down makes right turn
+				map[el[0]][el[1]]='p1tail_'+el[2]+'_'+array[id-1][2];
+			}
+		});
 	}
 	io.to(game.name)
 		.emit('game update',{msg:'update the game state',data:game});
@@ -130,13 +163,13 @@ io.on('connection',function(socket){
 				mapStart:mapScheme.map(),
 				player1:{
 					name:games[games.length-1].players[0],
-					position:[0,0],
+					position:[[0,0,'right']],
 					turn:'right',
 					points:0
 				},
 				player2:{
 					name:games[games.length-1].players[1],
-					position:[mapScheme.width-1,mapScheme.height-1],
+					position:[[mapScheme.width-1,mapScheme.height-1],'left'],
 					turn:'left',
 					points:0
 				}
