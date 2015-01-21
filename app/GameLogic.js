@@ -46,7 +46,6 @@ function stopGame(game,winner,reason){
 				return true;
 			}
 		});
-		console.log('stopping game'+game.name);
 		io.to(game.name)
 			.emit('game stop',{msg:reason,data:game});
 }
@@ -79,8 +78,6 @@ function updateMap(game,map){
 
 	
 	[head1,head2].forEach(function(head,id,array){
-		console.log('checking player'+(id+1));
-		console.log(head);
 		//check if target is out of bounds
 		if(head[0]<0||head[0]>mapScheme.width-1||head[1]<0||head[1]>mapScheme.heigth-1){
 			stopGame(game,'player'+(2-id),'player'+(id+1)+' out of bounds');
@@ -92,7 +89,6 @@ function updateMap(game,map){
 			return [bPart[0],bPart[1]].toString();
 		}).indexOf([playerObject[0][0],playerObject[0][1]].toString(),1);
 		if(sameAsHead>-1){
-			console.log('need to delete'+(playerObject.length-sameAsHead)+'elements');
 			playerObject.splice(sameAsHead,playerObject.length-sameAsHead).forEach(function(el){
 				//the eaten elements are conveted to plain fields aka 0
 				map[el[0]][el[1]]=0;
@@ -152,7 +148,6 @@ function updateMap(game,map){
 io.on('connection',function(socket){
 		var nameOnSocket;
 		var gameOnSocket;
-		console.log('new user have entered');
 
 		socket.on('get name',function(msg){
 			if(users.indexOf(msg.name)>=0){
@@ -165,11 +160,9 @@ io.on('connection',function(socket){
 		});
 
 		socket.on('find game',function(msg){
-			console.log(msg.name+ ' wants to join a game');
 			if(!games[games.length-1]||(games[games.length-1].playersNumber===2)){
 				//creates new game
 				games[games.length]={name:(msg.name+'s game'),playersNumber:1,players:[msg.name]};
-				console.log(games);
 				gameOnSocket=msg.name+'s game';
 				socket.join(msg.name+'s game');
 			}else{
@@ -190,7 +183,6 @@ io.on('connection',function(socket){
 						points:0
 					}
 				};
-				console.log(games);
 				gameOnSocket=games[games.length-1].players[0]+'s game';
 				socket.join(games[games.length-1].players[0]+'s game');
 				io.to(games[games.length-1].players[0]+'s game')

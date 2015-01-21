@@ -6,13 +6,11 @@
       border:5px ridge #c3c3c3;
       border-radius: 10px;
 }
-#homescreen{
-      /*background: #1c1c1c;
-      font: 13px Helvetica, Arial;
-      color: white;
-      height: 400px;
-      border:5px ridge #c3c3c3;
-      border-radius: 10px;*/
+#homescreen>div:first-of-type {
+      background-image: url(../img/home.png);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
 }
 #homescreen input{
       background: #222222;
