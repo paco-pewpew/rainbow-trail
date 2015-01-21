@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="chatApp">
+<html ng-app="rainbowTrail">
 <head>
 	      <title>The beginning of awesomeness</title>
         <link rel="stylesheet" type="text/css" href="libs/bootstrap/dist/css/bootstrap.min.css">
@@ -19,17 +19,24 @@
               <input id="name" ng-model="username">
               <button ng-click="setName()">choose name</button>
             </form>
+            <span ng-show="errorSetName">{{errorSetName}}</span>
           </div>
           <div id="userPannel" class="row" ng-show="isLogged">
              <p>{{username|uppercase}}</p>
-             <div gamehistory class="col-xs-12">
+             <div gamehistory historydata="{{gameHistory}}" class="col-xs-12">
             </div>
              <button ng-show="!gameData && !searchingForGame" ng-click="findGame()">Find a game</button>
-             <div ng-show="searchingForGame">
+             <!--<div ng-show="searchingForGame">
                 <p>waiting for the second fat unicorn ...</p>
                 <div id="loadingPic"></div>
-             </div>
+             </div>-->
           </div>
+
+          <div class="row" ng-show="searchingForGame">
+                <p>waiting for the second fat unicorn ...</p>
+                <div id="loadingPic"></div>
+          </div>
+
           <div id="postGameData" class="row" ng-show="gameData && !searchingForGame">
             <div class="col-xs-6 col-xs-offset-3">
               <p>You {{gameData.gameData[gameData.gameData.winner].name===username?'WON':'LOST'}}</p>
@@ -66,7 +73,7 @@
             {{player.name}} : {{player.points}}
           </p>
         </div>
-        <div id="gameStickFrame" class="row">
+        <div id="gameStickFrame" class="row" ng-controller="GameStickCtrl">
           <div class="col-xs-12" gamestick turn="{{turn}}">
             <label id="topButton" ng-click="setTurn('up')"></label>
             <label id="leftButton" ng-click="setTurn('left')"></label>
@@ -83,6 +90,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="libs/angular/angular.min.js"></script>
   <script src="js/services/SocketService.js"></script>
+  <script src="js/directives/Directives.js"></script>
   <script src="js/controllers/GameStickController.js"></script>
   <script src="app.js"></script>
 

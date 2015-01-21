@@ -1,9 +1,13 @@
 <div>Past games:</div>
 <span ng-show="gameHistory.length===0">You haven't played any games</span>
 <span ng-show="gameHistory.length!==0">
-<span class="glyphicon glyphicon-circle-arrow-left"></span>
-<span ng-class="{'gameWon':game.winner===username,'gameLost':game.winner!==username}" ng-repeat="game in gameHistory">
-	{{game.game}}
+<span class="glyphicon glyphicon-circle-arrow-left" 
+	ng-click="history.previous()" ng-show="history.current>0"></span>
+
+<span ng-class="{'gameWon':game.winner===username,'gameLost':game.winner!==username}" ng-repeat="game in gameHistory" ng-show="$index===history.current">
+	{{game.game}} vs {{game.opponent}}
 </span>
-<span class="glyphicon glyphicon-circle-arrow-right"></span>
+
+<span class="glyphicon glyphicon-circle-arrow-right"
+	 ng-click="history.next()" ng-show="history.current<gameHistory.length-1"></span>
 </span>

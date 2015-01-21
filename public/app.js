@@ -1,24 +1,45 @@
 'use strict';
-angular.module('chatApp',['SocketService'])
-	.controller('ChatCtrl',['$scope','socketio','$window',function($scope,socketio,$window){
-		/*$scope.messages=[{user:'server',text:'Hello'}];
-		$scope.message;*/
+angular.module('rainbowTrail',['SocketService','Directives','GameStickController'])
+	.controller('ChatCtrl',['$scope','$window','socketio',
+		function($scope,$window,socketio){
+		$scope.username;
 		$scope.isLogged=false;
 		$scope.inGame=false;
 		$scope.searchingForGame=false;
 		$scope.turn='idle';
 		$scope.gameHistory=[];
+		$scope.history={
+			current:0,
+			next:function(){
+				this.current+=1;
+			},
+			previous:function(){
+				this.current-=1;
+			}
+		};
 
 		$scope.setTurn=function(way){
-			$scope.turn=way;
-			//broadcast to my room
-			socketio.emit('change direction',way);
+			if((['up','down'].indexOf($scope.turn)>=0 && ['up','down'].indexOf(way)>=0)||(['left','right'].indexOf($scope.turn)>=0 && ['left','right'].indexOf(way)>=0)){
+				//shouldn't go reverse - up from down and left from right 
+			}else{
+				$scope.turn=way;
+				socketio.emit('change direction',way);
+			}
 		};
 
 		$scope.setName=function(){
-			console.log('fired');
-			$scope.isLogged=true;
+			//sends username=>server will respond with 'set name'
+			socketio.emit('get name',{name:$scope.username});
 		};
+
+		socketio.on('set name',function(msg){
+			//if taken=>show err msg, if free- logs with this name
+			if(msg.free==='no'){
+				$scope.errorSetName='there is already a user with the same name';
+			}else{
+				$scope.isLogged=true;
+			}
+		});
 		
 		$scope.findGame=function(){
 			delete $scope.gameData;
@@ -39,143 +60,20 @@ angular.module('chatApp',['SocketService'])
 		});
 
 		socketio.on('game stop',function(msg){
-			//$scope.inGame=false;
+			$scope.turn='idle';
 			$scope.gameData=msg.data;
 			$scope.stopReason=msg.msg;
 			$scope.inGame=false;
-			$scope.gameHistory.unshift({game:msg.data.name,winner:msg.data.gameData[msg.data.gameData.winner].name});
+			$scope.gameHistory.unshift({
+				game:msg.data.name,
+				winner:msg.data.gameData[msg.data.gameData.winner].name,
+				opponent:msg.data.players[1-msg.data.players.indexOf($scope.username)]
+			});
 
 			console.log(msg);
 			console.log($scope.gameHistory);
 		});
-
-		//keyboard controlls
-		$window.addEventListener('keydown', function(event) {
-		  switch (event.keyCode) {
-		    case 37: // Left
-		      $scope.setTurn('left');
-		    break;
-
-		    case 38: // Up
-		      $scope.setTurn('up');
-		    break;
-
-		    case 39: // Right
-		      $scope.setTurn('right');
-		    break;
-
-		    case 40: // Down
-		      $scope.setTurn('down');
-		    break;
-		  }
-		}, false);
+	
 	}])
 
-.directive('gamestick',function(){
-		return{
-			restrict:'EA',
-			link:function(scope,element,attrs){
-				attrs.$observe('turn',function(value){
-					element.css({
-					'background-image': 'url(../img/gameStick_'+value+'.png)',
-					//'background-size':'100px 100px',
-					'background-size':'100% 100%',
-					'background-repeat':'no-repeat',
-					'border':'3px ridge #c3c3c3',
-					'border-radius':'50%',
-					'height':'100px',
-					'padding':'0px'
-					});
-				});
-			}
-		};
-	})
-.directive('gamecell',function(){
-	return{
-		restrict:'EA',
-		scope:{mapcell:'@'},
-		link:function(scope,element,attrs){
-			var rotate=0;
-			switch(scope.mapcell){
-				case('p1tail_right_right'):
-				scope.mapcell='tail_forward';
-				rotate=0;
-				break;
-				case('p1tail_down_down'):
-				scope.mapcell='tail_forward';
-				rotate=90;
-				break;
-				case('p1tail_left_left'):
-				scope.mapcell='tail_forward';
-				rotate=180;
-				break;
-				case('p1tail_up_up'):
-				scope.mapcell='tail_forward';
-				rotate=270;
-				break;
-
-				case('p1tail_right_down'):
-				scope.mapcell='tail_turnRight';
-				rotate=0;
-				break;
-				case('p1tail_down_left'):
-				scope.mapcell='tail_turnRight';
-				rotate=90;
-				break;
-				case('p1tail_left_up'):
-				scope.mapcell='tail_turnRight';
-				rotate=180;
-				break;
-				case('p1tail_up_right'):
-				scope.mapcell='tail_turnRight';
-				rotate=270;
-				break;
-
-				case('p1tail_right_up'):
-				scope.mapcell='tail_turnLeft';
-				rotate=0;
-				break;
-				case('p1tail_up_left'):
-				scope.mapcell='tail_turnLeft';
-				rotate=270;
-				break;
-				case('p1tail_left_down'):
-				scope.mapcell='tail_turnLeft';
-				rotate=180;
-				break;
-				case('p1tail_down_right'):
-				scope.mapcell='tail_turnLeft';
-				rotate=90;
-				break;
-
-				case('p1tailEnd_right'):
-				scope.mapcell='tailEnd';
-				rotate=0;
-				break;
-				case('p1tailEnd_down'):
-				scope.mapcell='tailEnd';
-				rotate=90;
-				break;
-				case('p1tailEnd_left'):
-				scope.mapcell='tailEnd';
-				rotate=180;
-				break;
-				case('p1tailEnd_up'):
-				scope.mapcell='tailEnd';
-				rotate=270;
-				break;
-
-			}
-			element.css({
-					'background-image': 'url(../img/'+scope.mapcell+'.png)',
-					'transform':'rotate('+rotate+'deg)'
-				});
-		}
-	};
-})
-.directive('gamehistory',function(){
-	return{
-		restrict:'EA',
-		templateUrl:'../views/gamehistory.html'
-	};
-});
+;

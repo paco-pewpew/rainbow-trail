@@ -1,5 +1,5 @@
 {
-  "name": "socket-chat",
+  "name": "rainbow-trail",
   "description": "first socket.io",
   "dependencies": {
     "express": "4.10.2",

@@ -1,5 +1,5 @@
 {
-  "name": "chat-project",
+  "name": "rainbow-project",
   "dependencies": {
     "angular": "~1.3.8",
     "bootstrap": "~3.3.1"
