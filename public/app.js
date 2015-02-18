@@ -1,7 +1,7 @@
 'use strict';
-angular.module('rainbowTrail',['SocketService','Directives','GameStickController'])
-	.controller('ChatCtrl',['$scope','$window','socketio',
-		function($scope,$window,socketio){
+angular.module('rainbowTrail',['SocketService','UtilityServices','Directives','GameStickController'])
+	.controller('GameCtrl',['$scope','$window','socketio','loader','allImages',
+		function($scope,$window,socketio,loader,allImages){
 		$scope.username;
 		$scope.isLogged=false;
 		$scope.inGame=false;
@@ -17,6 +17,11 @@ angular.module('rainbowTrail',['SocketService','Directives','GameStickController
 				this.current-=1;
 			}
 		};
+
+
+		$scope.imageLocations=allImages;
+		var preloader=new loader($scope.imageLocations);
+
 
 		$scope.setTurn=function(way){
 			if((['up','down'].indexOf($scope.turn)>=0 && ['up','down'].indexOf(way)>=0)||(['left','right'].indexOf($scope.turn)>=0 && ['left','right'].indexOf(way)>=0)){
@@ -37,7 +42,16 @@ angular.module('rainbowTrail',['SocketService','Directives','GameStickController
 			if(msg.free==='no'){
 				$scope.errorSetName='there is already a user with the same name';
 			}else{
-				$scope.isLogged=true;
+				preloader.load().then(
+					function handleResolve(){
+						console.log('loading successful');
+						$scope.isLogged=true;
+					},function handleReject(){
+						console.log('loading error');
+					},function handleNotify(event){
+						$scope.percentLoaded=event.percent;
+						console.log('Percentage loaded ',event.percent);
+					});
 			}
 		});
 		

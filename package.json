@@ -1,6 +1,11 @@
 {
   "name": "rainbow-trail",
   "description": "first socket.io",
+  "main":"server.js",
+  "scripts":{
+  	"start":"node server.js",
+    "postinstall": "bower install"
+  },
   "dependencies": {
     "express": "4.10.2",
     "socket.io": "1.2.0"
