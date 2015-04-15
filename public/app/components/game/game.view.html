@@ -1,0 +1,33 @@
+<div id="game">
+  <div ng-repeat="roll in vm.gameData.gameData.mapStart">
+    <game-cell ng-repeat="column in roll track by $index" mapcell="{{column}}"></game-cell>
+  </div>
+</div>
+
+<div id="gameInfo">
+  <div id="stats">
+    <p ng-repeat="player in [vm.gameData.gameData.player1,vm.gameData.gameData.player2] track by $index">
+      {{player.name}} : {{player.points}}
+    </p>
+  </div>
+
+  <game-stick></game-stick>
+  
+</div>
+
+<div id="gameOver" ng-show="vm.stopReason">
+	<p>{{vm.gameData.gameData[vm.gameData.gameData.winner].name===vm.username?'VICTORY':'DEFEAT'}}</p>
+    
+    <div id="playerOne">
+      <p>{{vm.gameData.gameData.player1.name}}</p>    
+    </div>
+    <span>vs</span>
+    <div id="playerTwo">
+      <p>{{vm.gameData.gameData.player2.name}}</p>
+    </div>
+
+    <p>Reason: {{vm.stopReason}}</p>
+    <p>Winner: {{vm.gameData.gameData[vm.gameData.gameData.winner].name}} ({{vm.gameData.gameData.winner}})</p>
+    <button class="imba-btn imba-btn-block" ng-click="vm.returnHome()">GG, go home</button>
+</div>
+

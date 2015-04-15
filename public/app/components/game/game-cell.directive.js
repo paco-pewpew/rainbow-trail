@@ -1,30 +1,27 @@
-'use strict';
-angular.module('Directives',[])
-	.directive('gamestick',function(){
-		return{
-			restrict:'EA',
-			link:function(scope,element,attrs){
-				attrs.$observe('turn',function(value){
-					element.css({
-					'background-image': 'url(../img/gameStick_'+value+'.png)',
-					//'background-size':'100px 100px',
-					'background-size':'100% 100%',
-					'background-repeat':'no-repeat',
-					'border':'3px ridge #c3c3c3',
-					'border-radius':'50%',
-					'height':'100px',
-					'padding':'0px'
-					});
-				});
-			}
-		};
-	})
-.directive('gamecell',function(){
-	return{
-		restrict:'EA',
-		scope:{mapcell:'@'},
-		link:function(scope,element,attrs){
-			var rotate=0;
+(function() {
+    'use strict';
+
+    angular
+        .module('rainbowTrail')
+        .directive('gameCell', gameCell);
+
+    /* @ngInject */
+    function gameCell () {
+        // Usage:
+        //
+        // Creates:
+        //
+        var directive = {
+            link: link,
+            restrict: 'E',
+            scope: {
+            	mapcell:'@'
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs) {
+        	var rotate=0;
 			switch(scope.mapcell){
 				case('tail_right_right'):
 				scope.mapcell='tail_forward';
@@ -96,15 +93,10 @@ angular.module('Directives',[])
 
 			}
 			element.css({
-					'background-image': 'url(../img/'+scope.mapcell+'.png)',
-					'transform':'rotate('+rotate+'deg)'
-				});
-		}
-	};
-})
-.directive('gamehistory',function(){
-	return{
-		restrict:'EA',
-		templateUrl:'../views/gamehistory.html',
-	};
-});
+				'background-image': 'url(assets/img/'+scope.mapcell+'.png)',
+				'transform':'rotate('+rotate+'deg)'
+			});
+        }
+    }
+
+})();

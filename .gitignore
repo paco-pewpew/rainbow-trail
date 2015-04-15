@@ -11,4 +11,11 @@ node_modules/
 # --------------------
 .bower-*/
 bower_components
-public/libs
+
+# --------------------
+# Generated Files
+# --------------------
+public/assets/libs
+public/assets/css
+public/assets/js
+

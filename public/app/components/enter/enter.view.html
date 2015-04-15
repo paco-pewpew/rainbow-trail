@@ -1,0 +1,7 @@
+<form id="enterForm">
+	<label>USERNAME: </label>
+	<input id="name" ng-model="vm.username">
+	<button class="imba-btn" ng-click="vm.setName()">choose name</button>
+</form>
+<span ng-show="vm.errors.name">Cannot use that name</span>
+{{vm.resourcesPercentage}}

@@ -1,0 +1,77 @@
+#game{
+    background-image: url(../img/BG.png);
+    background-size: 100% 100%;
+    float:left;
+    height:400px;
+    width: 400px;
+    border-radius: 5px;
+    border: 2px solid black;
+    box-shadow: rgba(106, 163, 234, 0.7) 0px 0px 5px;
+      
+    div{
+    	height: 40px;
+        width:400px;
+        display: block;
+    }
+    game-cell{
+    	width:10%;
+        height: 100%;
+        float: left;
+        background-size: 100% 100%;
+	    box-shadow: inset rgba(106, 163, 234, 0.4) 0px 0px 5px;
+    }
+}
+
+#gameInfo{
+	float:right;
+	height: 400px;
+	width: 150px;
+	#stats{
+	  position: relative;
+	  display: block;
+      border:3px groove #c3c3c3;
+      border-radius: 3px;     
+      height:150px;
+	}
+	game-stick{
+		position: relative;
+		display: block;
+		height: 150px;
+		width: 150px;
+        margin-top: 80px;
+        border: 2px solid black;
+        box-shadow: rgba(106, 163, 234, 0.7) 0px 0px 5px;
+        border-radius: 50%;
+	}
+}
+
+#gameOver{
+    position: absolute;
+    top:0px;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(20,20,20,0.7);
+    text-align: center;
+    #playerOne,#playerTwo{
+        height: 150px;
+        width: 150px;
+        position:relative;
+        display: inline-block;
+        background-size: 70%;
+        background-repeat: no-repeat;
+        background-position: center top;
+        p{
+            margin: 0px;
+            padding: 0px;
+            margin-top: 70%;
+            height: 30%;
+        }
+    }
+    #playerOne{
+        background-image:url('../img/p1.png');
+    }
+    #playerTwo{
+        background-image:url('../img/p2.png');
+    }
+}

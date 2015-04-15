@@ -1,0 +1,11 @@
+<div id="userPannel">
+   <p>{{vm.userdata.username||' name not set'|uppercase}}</p>
+   <history historydata="vm.userdata.gamehistory" class="col-xs-12"></history>
+</div>
+
+
+<div id="searchGame">
+      <button class="imba-btn imba-btn-block" ng-show="!vm.searchingForGame" ng-click="vm.findGame()">Find a game</button>
+      <p ng-show="vm.searchingForGame">waiting for the second fat unicorn ...</p>
+      <div id="loadingPic" ng-show="vm.searchingForGame"></div>
+</div>
