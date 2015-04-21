@@ -1,15 +1,16 @@
 {
   "name": "rainbow-trail",
   "description": "first socket.io",
-  "main":"server.js",
-  "scripts":{
-  	"start":"node server.js",
-    "postinstall": "bower install"
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "postinstall": "bower install && grunt"
   },
   "dependencies": {
+    "bower": "~1.3.12",
     "express": "4.10.2",
-    "socket.io": "1.2.0",
-    "bower":"~1.3.12"
+    "serve-favicon": "^2.2.0",
+    "socket.io": "1.2.0"
   },
   "devDependencies": {
     "grunt": "latest",

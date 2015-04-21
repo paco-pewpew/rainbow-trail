@@ -25,7 +25,6 @@
 
         function link(scope, element, attrs) {
         	scope.$watch('vm.direction',function(value){
-                console.log(value);
 				element.css({
 				'background-image': 'url(assets/img/gameStick_'+value+'.png)',
 				});

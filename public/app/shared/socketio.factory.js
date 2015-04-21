@@ -17,12 +17,17 @@
         ////////////////
 
         function on(eventName, callback) {
-	      socket.on(eventName, function () {  
-	        var args = arguments;
-	        $rootScope.$apply(function () {
-	          callback.apply(socket, args);
-	        });
-	      });
+        	//remove old listener if needed- no more multiple emits
+            //console.log(Object.keys(socket._callbacks.indexOf(eventName)));
+    		if(socket.hasListeners(eventName)){
+    			socket.removeEventListener(eventName);
+    		}
+    		socket.on(eventName,function(){
+    			var args=arguments;
+    			$rootScope.$apply(function(){
+    				callback.apply(socket,args);
+    			});
+    		});
 	    }
 
 	    function emit(eventName, data, callback) {

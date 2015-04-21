@@ -26,9 +26,9 @@
     }
 
     /* @ngInject */
-    function Controller () {
+    function Controller (userdata) {
         var vm=this;
-
+        vm.userdata=userdata;
         vm.historySlider={
             current:0,
             next:function(){

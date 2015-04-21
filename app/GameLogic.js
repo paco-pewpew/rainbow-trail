@@ -7,14 +7,23 @@ module.exports=function(io){
 var games=[];
 var users=[];
 
-var lastTime;
-function main() {
-    var now = Date.now();
-    var dt = (now - lastTime) / 1000.0;
-    updateGames(dt);
-    lastTime = now;
-    setTimeout(main,1000/1);
+var previousTick;
+var cycle;
+
+function gameLoop() {
+	if(games.length>0){
+		var now = Date.now();
+	    var dt = (now - previousTick) / 1000.0;
+	    //console.log(previousTick,now,dt);
+	    updateGames(dt);
+
+	    previousTick = now;
+	  	cycle=setTimeout(gameLoop,1000/1);	
+	}else{
+		clearTimeout(cycle);		
+	}	
 }
+
 function updateGames(dt){
 	games.forEach(function(game){
 		//if there are 2 players then we playing
@@ -23,7 +32,6 @@ function updateGames(dt){
 		}
 	});
 }
-main();
 
 function updatePosition(positions,turn){
 	switch(turn){
@@ -40,14 +48,30 @@ function stopGame(game,winner,reason){
 	//remove game from games array and iterator
 		games=games.filter(function(el){
 			if(el.name===game.name){
-				//probably should leave room lol?
 				return false;
 			}else{
 				return true;
 			}
 		});
+		//console.log('stopping game; Remaining games:',games);
 		io.to(game.name)
 			.emit('game stop',{msg:reason,data:game});
+		
+		//leave room
+
+
+		//socketio patch May not work properly; loop connected sockets:
+		var connectedS=io.of('/').connected;
+		for(var s in connectedS){
+			//if socket is in room
+			if(connectedS[s].rooms.indexOf(game.name)!==-1){
+				//attempt to leave room
+				connectedS[s].leave(game.name);
+			}
+		}
+		//stops loop if not active
+		gameLoop();
+		
 }
 
 function updateMap(game,map){
@@ -76,14 +100,16 @@ function updateMap(game,map){
 	updatePosition(head2,game.gameData.player2.turn);
 	
 
-	
-	[head1,head2].forEach(function(head,id,array){
-		//check if target is out of bounds
-		if(head[0]<0||head[0]>mapScheme.width-1||head[1]<0||head[1]>mapScheme.heigth-1){
+	//HEAD positions
+	[head1,head2].every(function(head,id,array){
+		
+		//OUT OF BOUNDS
+		if(head[0]<0||head[0]>mapScheme.width-1||head[1]<0||head[1]>mapScheme.height-1){
 			stopGame(game,'player'+(2-id),'player'+(id+1)+' out of bounds');
-			return;
+			return false;
 		}
-		//eat its tail lololel.slice(1,el.length).indexOf(el);
+
+		//OWN TAIL collision(eats part of the tail)
 		var playerObject=game.gameData['player'+(id+1)].position;
 		var sameAsHead=playerObject.map(function(bPart){
 			return [bPart[0],bPart[1]].toString();
@@ -96,22 +122,20 @@ function updateMap(game,map){
 				game.gameData['player'+(id+1)].points-=1;
 			});
 		}
-		//check collision with static map objects
-		switch(map[head[0]][head[1]]){
-			case(1):
-			//hit wall
-			//stops the game
+
+		//CELL TYPE ON HEAD - nothing,bonus,wall,other player's head or tail
+		if(map[head[0]][head[1]]===1){
+			//WALL
 			stopGame(game,'player'+(2-id),'player'+(id+1)+' has crashed');
-			break;
-			case(0):
-			//normal case
-			//removes last cuz head was created
-			var last=game.gameData['player'+(id+1)].position.pop();
-			map[last[0]][last[1]]=0;
-			//removes point and coontinue with things from case2 cuz its the same
-			game.gameData['player'+(id+1)].points-=1;
-			case(2):
-			//adds bonus bonus
+			return false;
+		}else if(map[head[0]][head[1]]===2||map[head[0]][head[1]]===0){
+			//EMPTY or BONUS -safe place
+			if(map[head[0]][head[1]]===0){
+				var last=game.gameData['player'+(id+1)].position.pop();
+				map[last[0]][last[1]]=0;
+				game.gameData['player'+(id+1)].points-=1;	
+			}
+			//BONUS
 			game.gameData['player'+(id+1)].points+=1;
 			game.gameData['player'+(id+1)].position.forEach(function(bPart,i,arr){
 				if(i===0){
@@ -123,21 +147,21 @@ function updateMap(game,map){
 					map[bPart[0]][bPart[1]]='tail_'+bPart[2]+'_'+arr[i-1][2];
 				}
 			});
-			break;
-			default:
-			//all thats is left unchecked is parts of the tail of the other player
-			//die when hit other players tail or eat it??? ...TRON style
-			if(/tail/.test(map[head[0]][head[1]])){
-				stopGame(game,'player'+(2-id),'player'+(id+1)+' recieved a rainbow burn');
+			return true;
+		}else if(/tail/.test(map[head[0]][head[1]])){
+			stopGame(game,'player'+(2-id),'player'+(id+1)+' recieved a rainbow burn');
+		}else{
+			//horn battle
+			if(game.gameData.player1.points>=game.gameData.player2.points){
+				stopGame(game,'player1','trial by horn combat');
+				return false;
+
 			}else{
-				//horn battle
-				if(game.gameData.player1.points>=game.gameData.player2.points){
-					stopGame(game,'player1','trial by horn combat');
-				}else{
-					stopGame(game,'player2','trial by horn combat');
-				}		
-			}
+				stopGame(game,'player2','trial by horn combat');
+				return false;
+			}		
 		}
+
 	});
 
 	io.to(game.name)
@@ -162,9 +186,10 @@ io.on('connection',function(socket){
 		socket.on('find game',function(msg){
 			if(!games[games.length-1]||(games[games.length-1].playersNumber===2)){
 				//creates new game
-				games[games.length]={name:(msg.name+'s game'),playersNumber:1,players:[msg.name]};
-				gameOnSocket=msg.name+'s game';
-				socket.join(msg.name+'s game');
+				var now=Date.now();
+				gameOnSocket=msg.name+'s game'+now;
+				games[games.length]={name:(gameOnSocket),playersNumber:1,players:[msg.name]};
+				socket.join(gameOnSocket);
 			}else{
 				games[games.length-1].playersNumber=2;
 				games[games.length-1].players.push(msg.name);
@@ -183,9 +208,13 @@ io.on('connection',function(socket){
 						points:0
 					}
 				};
-				gameOnSocket=games[games.length-1].players[0]+'s game';
-				socket.join(games[games.length-1].players[0]+'s game');
-				io.to(games[games.length-1].players[0]+'s game')
+				gameOnSocket=games[games.length-1].name;
+				socket.join(gameOnSocket);
+
+				//start loop if not active
+				gameLoop();
+				//start game;
+				io.to(gameOnSocket)
 					.emit('game start',{msg:'game is going to start',data:games[games.length-1]});
 			}
 		});
@@ -194,9 +223,14 @@ io.on('connection',function(socket){
 			//finds game which the socket is playing on then finds if he is p1 or p2 then changes his turn ala direction
 			games.forEach(function(game){
 				//finds game
-				if(game.name===gameOnSocket){
-					var p=game.players.indexOf(nameOnSocket); //0- player1 or 1-player2
-					game.gameData['player'+(p+1)].turn=direction;
+				try{
+					if(game.name===gameOnSocket){
+						var p=game.players.indexOf(nameOnSocket); //0- player1 or 1-player2
+						game.gameData['player'+(p+1)].turn=direction;
+					}
+				}catch(err){
+					//key turn may fire after game is done or smth like that
+					//console.log('error trying to turn',err);
 				}
 
 			});

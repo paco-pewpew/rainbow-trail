@@ -1,18 +1,18 @@
 <div>Past games:</div>
 
-<span ng-show="vm.historydata.length===0">You haven't played any games</span>
+<div ng-show="vm.historydata.length===0">You haven't played any games</div>
 
-<span ng-show="vm.historydata.length!==0">
+<div ng-show="vm.historydata.length!==0">
 
 	<i class="fa fa-arrow-circle-left"
 	ng-click="vm.historySlider.previous()" ng-show="vm.historySlider.current>0"></i>
 
-	<span ng-class="{'gameWon':game.winner===username,'gameLost':game.winner!==username}"
+	<span ng-class="{'gameWon':game.winner===vm.userdata.username,'gameLost':game.winner!==vm.userdata.username}"
 	ng-repeat="game in vm.historydata" ng-show="$index===vm.historySlider.current">
-		{{game.game}} vs {{game.opponent}}
+		{{game.game}} - {{game.winner===vm.userdata.username?'WIN':'LOSS'}} vs {{game.opponent}}
 	</span>
 
 
 	<i class="fa fa-arrow-circle-right"
 	ng-click="vm.historySlider.next()" ng-show="vm.historySlider.current<vm.historydata.length-1"></i>
-</span>
+</div>

@@ -22,9 +22,7 @@
 
 
 		Socketio.on('game start',function(msg){
-			console.log(msg);
 			vm.searchingForGame=false;
-			//vm.gameData=msg.data;
 			$state.go('game');
 		});
 

@@ -24,20 +24,6 @@ module.exports = function(grunt) {
 	        }
 	    },
 
-	    uglify:{
-	    	dynamic:{
-	    		files:[{
-				  expand: true,
-				  cwd: '<%=js_dist_path%>',
-				  src: ['*.js','!*.min.js'],
-				  dest: '<%=js_dist_path%>',
-				  ext: '.min.js',
-				  extDot: 'last',
-				  flatten: true
-				}]
-	    	}
-	    },
-
 
 		less: {
 	      build: {
@@ -63,14 +49,42 @@ module.exports = function(grunt) {
 	    concat:{
 	    	js:{
 	    		files:[{
-				  src: ['<%=js_dist_path%>/*.min.js','!<%=js_dist_path%>/*.concat.min.js'],
-				  dest: '<%=js_dist_path%>/rainbow-trailBuilt.concat.min.js'
+				  src: ['<%=js_dist_path%>/*.js','!<%=js_dist_path%>/*.concat.js','!<%=js_dist_path%>/*.concat.min.js'],
+				  dest: '<%=js_dist_path%>/rainbow-trailBuilt.concat.js'
 				}]
 	    	},
 	    	css:{
 	    		files:[{
-	    			src:['<%=css_dist_path%>/*.css'],
+	    			src:['<%=css_dist_path%>/*.css','!<%=css_dist_path%>/*.concat.css','!<%=css_dist_path%>/*.concat.min.css'],
 	    			dest:'<%=css_dist_path%>/rainbow-trailStyle.concat.css'
+	    		}]
+	    	}
+	    },
+
+	     uglify:{
+	    	all:{
+	    		files:[{
+				  expand: true,
+				  cwd: '<%=js_dist_path%>',
+				  src: ['*.concat.js'],
+				  dest: '<%=js_dist_path%>',
+				  ext: '.min.js',
+				  extDot: 'last',
+				  flatten: true
+				}]
+	    	}
+	    },
+
+	    cssmin:{
+	    	all:{
+	    		files:[{
+	    		  expand: true,
+				  cwd: '<%=css_dist_path%>',
+				  src: ['*.concat.css'],
+				  dest: '<%=css_dist_path%>',
+				  ext: '.min.css',
+				  extDot: 'last',
+				  flatten: true
 	    		}]
 	    	}
 	    },
@@ -78,11 +92,11 @@ module.exports = function(grunt) {
 	    watch: {
 	      css: {
 	        files: ['<%=components_build_path%>/**/*.less','<%=shared_build_path%>/**/*.less'],
-	        tasks: ['less','concat:css']
+	        tasks: ['less','concat:css','cssmin']
 	      },
 	      js:{
 	      	files: ['<%=app_build_path%>/**/*.js'],
-	      	tasks: ['ngAnnotate','uglify','concat:js']
+	      	tasks: ['ngAnnotate','concat:js','uglify']
 	      }
 	    },
 
@@ -104,12 +118,13 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-ng-annotate');
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-cssmin');	
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-ng-annotate');
 	grunt.loadNpmTasks('grunt-nodemon');
 	grunt.loadNpmTasks('grunt-concurrent');
 	
-	grunt.registerTask('default',['less','ngAnnotate','uglify','concat','concurrent']);
-	grunt.registerTask('dev',['less','concurrent']);
+	grunt.registerTask('default',['less','ngAnnotate','concat','uglify','cssmin','concurrent']);
+	grunt.registerTask('dev',['concurrent']);
 };
